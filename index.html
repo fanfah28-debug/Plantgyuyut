@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plant Explorer | ใบงานอาณาจักรพืช ม.6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--green:#245b46;--leaf:#78a889;--mint:#eaf4ec;--cream:#f8f7f0;--ink:#26352d;--muted:#64736a;--line:#c9d9ce}
+*{box-sizing:border-box}body{margin:0;background:#f3f6f2;color:var(--ink);font-family:"Noto Sans Thai",system-ui,"Tahoma",sans-serif;line-height:1.6}
+header{background:linear-gradient(135deg,#245b46,#78a889);color:white;padding:28px 18px;text-align:center}
+header .leaf{font-size:40px}header h1{margin:4px 0;font-size:clamp(24px,5vw,36px)}header p{margin:0}
+.wrap{max-width:1000px;margin:22px auto;padding:0 14px}
+.card{background:white;border:1px solid var(--line);border-radius:16px;padding:20px;margin:14px 0;box-shadow:0 4px 14px #1b3b2510}
+h2{color:var(--green);font-size:21px;margin:0 0 12px}h3{margin:8px 0;color:var(--green)}
+label{display:block;font-weight:600;margin:9px 0 4px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid #b9cdbf;border-radius:9px;font:inherit;background:#fff;color:var(--ink)}
+textarea{min-height:85px;resize:vertical}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.btn{border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--green);color:white}
+.btn.secondary{background:#e8f2eb;color:var(--green);border:1px solid var(--line)}
+.btn.danger{background:#fff0ed;color:#9a3d2d;border:1px solid #f0c9bf}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.status{padding:10px 12px;background:var(--mint);border-radius:9px;color:var(--green);font-size:14px}
+.plant{border:1px dashed #a9c5b2;padding:14px;border-radius:12px;margin:12px 0;background:#fcfefc}
+.photo-preview{max-width:100%;max-height:260px;display:block;margin:10px auto;border-radius:10px}
+.small{font-size:13px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{border:1px solid var(--line);padding:8px;text-align:left}th{background:var(--mint);color:var(--green)}
+.table-wrap{overflow-x:auto}
+footer{text-align:center;color:var(--muted);padding:25px}
+.lab{background:radial-gradient(1200px 600px at 15% 0%,#2f7a5c 0%,transparent 60%),linear-gradient(165deg,#0d2e23 0%,#17493a 55%,#2b6a55 100%);padding:28px 14px 34px;color:#f2faf5}
+.lab-in{max-width:1180px;margin:0 auto}
+.lab-head h2{color:#fff;font-size:clamp(22px,3.6vw,30px);margin:0 0 4px}
+.lab-head p{margin:0 0 16px;color:#bfe0cd;font-size:15px}
+.glass{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);box-shadow:0 10px 34px rgba(0,0,0,.25)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.tab{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;font:inherit;font-weight:600;font-size:14px;color:#e3f4ea;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);cursor:pointer;transition:background .25s,transform .25s,color .25s}
+.tab i{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.tab:hover{background:rgba(255,255,255,.18)}
+.tab.on{background:#f2faf5;color:#13392c;transform:translateY(-1px)}
+.tab:focus-visible,.tool button:focus-visible,.hs:focus-visible,.hsitem:focus-visible,.hcard .x:focus-visible{outline:3px solid #ffe27a;outline-offset:2px}
+.lab-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:16px;align-items:stretch}
+.stage{position:relative;min-height:560px;height:100%;border-radius:22px;overflow:hidden;background:radial-gradient(circle at 50% 38%,rgba(190,240,210,.32) 0%,rgba(40,110,85,.18) 38%,rgba(8,30,22,.55) 100%);border:1px solid rgba(255,255,255,.2);box-shadow:inset 0 0 80px rgba(0,0,0,.25),0 18px 40px rgba(0,0,0,.3)}
+.stage canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+.stage canvas:active{cursor:grabbing}
+.hs-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hs{position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;border:2px solid var(--c);background:rgba(255,255,255,.95);color:#13392c;font:inherit;font-weight:700;font-size:14px;cursor:pointer;pointer-events:auto;display:grid;place-items:center;transition:opacity .35s,background .2s,color .2s;padding:0;will-change:transform}
+.hs::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:2px solid var(--c);opacity:0;animation:pulse 2.2s ease-out infinite}
+.hs.on{background:var(--c);color:#0d2e23}
+.hs:hover{background:var(--c)}
+@keyframes pulse{0%{transform:scale(.7);opacity:.85}100%{transform:scale(1.5);opacity:0}}
+.hcard{position:absolute;left:16px;bottom:16px;width:min(340px,calc(100% - 32px));padding:16px 18px 16px;border-radius:18px;background:rgba(10,38,28,.62);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 14px 40px rgba(0,0,0,.35);opacity:0;transform:translateY(18px) scale(.96);pointer-events:none;border-top:4px solid var(--c,#78a889)}
+.hcard.show{animation:cardIn .45s cubic-bezier(.2,.9,.3,1.2) forwards;pointer-events:auto}
+@keyframes cardIn{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+.hcard .tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--c,#78a889);color:#0d2e23;margin-bottom:6px}
+.hcard h4{margin:0 24px 4px 0;font-size:17px;color:#fff}
+.hcard p{margin:0;font-size:14px;color:#d6efe0;line-height:1.55}
+.hcard .x{position:absolute;right:10px;top:10px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;font-size:16px;cursor:pointer}
+.tool{position:absolute;right:14px;top:14px;display:flex;flex-direction:column;gap:8px;padding:8px;border-radius:16px}
+.tool button{width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#fff;font-size:18px;cursor:pointer;transition:background .2s}
+.tool button:hover{background:rgba(255,255,255,.28)}
+.tool button.on{background:#f2faf5;color:#13392c}
+.hint{position:absolute;left:14px;top:14px;padding:7px 12px;border-radius:12px;font-size:12px;color:#e3f4ea;max-width:calc(100% - 90px)}
+.info{border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.info.swap>*{animation:fadeUp .5s ease both}
+.info.swap>*:nth-child(2){animation-delay:.05s}.info.swap>*:nth-child(3){animation-delay:.1s}.info.swap>*:nth-child(4){animation-delay:.15s}.info.swap>*:nth-child(5){animation-delay:.2s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.info h3{margin:0;font-size:clamp(22px,3vw,28px);color:#fff}
+.info .sub{margin:0;color:var(--c);font-weight:600;font-size:15px}
+.info p{margin:0;color:#d6efe0;font-size:15px}
+.info h5{margin:0 0 6px;font-size:14px;color:#fff;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:4px 11px;border-radius:999px;font-size:13px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#eaf8f0}
+.hsitems{display:flex;flex-direction:column;gap:6px}
+.hsitem{display:flex;align-items:center;gap:10px;text-align:left;padding:9px 12px;border-radius:12px;font:inherit;font-size:14px;color:#f2faf5;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);cursor:pointer;transition:background .2s,transform .2s}
+.hsitem:hover{background:rgba(255,255,255,.2);transform:translateX(3px)}
+.hsitem b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:#0d2e23;font-size:12px}
+.nowebgl{padding:40px 20px;text-align:center;color:#ffe9b0}
+@media(max-width:900px){.lab-grid{grid-template-columns:1fr}.stage{min-height:440px;height:440px}}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.card{padding:15px}table{min-width:700px}.hint{display:none}}
+@media(prefers-reduced-motion:reduce){.hs::after,.hcard.show,.info.swap>*{animation:none}.hcard.show{opacity:1;transform:none}}
+@media print{.lab{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="leaf">🌿 📷 🔎</div>
+  <h1>Plant Explorer</h1>
+  <p>ใบงานออนไลน์ • นักสำรวจอาณาจักรพืช • ชีววิทยา ม.6</p>
+  <p>กิจกรรมคู่ 2 คน</p>
+</header>
+
+<section class="lab" aria-label="ห้องปฏิบัติการพืช 3 มิติ">
+  <div class="lab-in">
+    <div class="lab-head">
+      <h2>🔬 Plant Lab 3D</h2>
+      <p>เลือก Division แล้วหมุนดูโมเดล คลิกจุดเลขบนโมเดลเพื่ออ่านลักษณะสำคัญที่ใช้จำแนกพืช</p>
+    </div>
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <div class="lab-grid">
+      <div class="stage" id="stage">
+        <div class="hs-layer" id="hsLayer"></div>
+        <div class="hint glass">ลากเพื่อหมุน • คลิกขวา/ลากสองนิ้วเพื่อแพน • ล้อเมาส์เพื่อซูม</div>
+        <div class="tool glass">
+          <button id="btnRotate" class="on" title="หมุนอัตโนมัติ" aria-label="หมุนอัตโนมัติ">⟳</button>
+          <button id="btnHs" class="on" title="แสดง/ซ่อนจุดข้อมูล" aria-label="แสดงหรือซ่อนจุดข้อมูล">◉</button>
+          <button id="btnReset" title="รีเซ็ตมุมกล้อง" aria-label="รีเซ็ตมุมกล้อง">⌖</button>
+        </div>
+        <div class="hcard" id="hcard" role="status" aria-live="polite"></div>
+      </div>
+      <aside class="info glass" id="info"></aside>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="card">
+    <h2>👩‍🎓 ข้อมูลสมาชิก</h2>
+    <div class="grid">
+      <div><label>ชื่อ–นามสกุล สมาชิกคนที่ 1</label><input id="student1" placeholder="ชื่อและนามสกุล"></div>
+      <div><label>ชั้น / เลขที่</label><input id="class1" placeholder="เช่น 6/1 เลขที่ 12"></div>
+      <div><label>ชื่อ–นามสกุล สมาชิกคนที่ 2</label><input id="student2" placeholder="ชื่อและนามสกุล"></div>
+      <div><label>ชั้น / เลขที่</label><input id="class2" placeholder="เช่น 6/1 เลขที่ 13"></div>
+      <div><label>โรงเรียน</label><input id="school" placeholder="ชื่อโรงเรียน"></div>
+      <div><label>วันที่สำรวจ</label><input id="date" type="date"></div>
+    </div>
+    <div class="actions"><button class="btn secondary" onclick="saveLocal()">💾 บันทึกในอุปกรณ์นี้</button><button class="btn secondary" onclick="loadLocal()">↩️ โหลดข้อมูลที่บันทึก</button></div>
+    <p class="small">หมายเหตุ: รุ่น HTML นี้บันทึกข้อมูลไว้ในเบราว์เซอร์ของอุปกรณ์ที่ใช้งาน (Local Storage) ยังไม่ได้ส่งข้อมูลไปยังฐานข้อมูลกลางของครู</p>
+  </div>
+
+  <div class="card">
+    <h2>🎯 ภารกิจ</h2>
+    <ul>
+      <li>สำรวจพืชในโรงเรียนอย่างน้อย 8 ชนิด</li>
+      <li>ถ่ายภาพพืชจริง และบันทึกบริเวณที่พบ</li>
+      <li>จำแนก Division พร้อมอธิบายลักษณะเด่นและหลักฐาน</li>
+      <li>ไม่เด็ดหรือทำลายพืชระหว่างสำรวจ</li>
+    </ul>
+    <div class="status">Division ที่ใช้เป็นแนวทาง: Bryophyta • Pteridophyta • Gymnosperms • Angiosperms</div>
+  </div>
+
+  <div class="card">
+    <h2>📋 ตารางสำรวจพืช</h2>
+    <p class="small">กรอกข้อมูลพืชอย่างน้อย 8 ชนิด สามารถเพิ่มรายการได้</p>
+    <div id="plants"></div>
+    <div class="actions"><button class="btn secondary" onclick="addPlant()">＋ เพิ่มพืชอีก 1 รายการ</button></div>
+  </div>
+
+  <div class="card">
+    <h2>📸 หลักฐานภาพถ่าย</h2>
+    <p>เลือกภาพพืชที่สำรวจ 4 ชนิด เพื่อใช้เป็นหลักฐานประกอบการจำแนก</p>
+    <div id="evidence"></div>
+  </div>
+
+  <div class="card">
+    <h2>🧠 วิเคราะห์และอภิปรายผล</h2>
+    <label>1. พบพืช Division ใดมากที่สุด เพราะเหตุใดจึงคิดว่าพบมากในโรงเรียน?</label><textarea id="q1"></textarea>
+    <label>2. พืชที่สำรวจมีลักษณะใดเหมือนกัน และแตกต่างกันอย่างชัดเจน?</label><textarea id="q2"></textarea>
+    <label>3. หากพบพืชไม่มีดอก จะใช้ลักษณะใดจำแนก และมีข้อจำกัดอะไร?</label><textarea id="q3"></textarea>
+    <label>4. พืชเมล็ดเปลือยแตกต่างจากพืชดอกอย่างไร?</label><textarea id="q4"></textarea>
+    <label>5. จะปรับปรุงวิธีสำรวจให้มีความน่าเชื่อถือมากขึ้นได้อย่างไร?</label><textarea id="q5"></textarea>
+    <label>สรุปผลการเรียนรู้</label><textarea id="summary" placeholder="สรุปสิ่งที่ได้เรียนรู้จากการสำรวจ"></textarea>
+    <div class="grid">
+      <div><label>หน้าที่สมาชิกคนที่ 1</label><input id="role1"></div>
+      <div><label>หน้าที่สมาชิกคนที่ 2</label><input id="role2"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📤 ส่งออกผลงาน</h2>
+    <p>ดาวน์โหลดข้อมูลเป็นไฟล์ JSON เพื่อส่งให้ครู หรือพิมพ์/บันทึกเป็น PDF ผ่านเมนูพิมพ์ของเบราว์เซอร์</p>
+    <div class="actions">
+      <button class="btn" onclick="exportJSON()">⬇️ ดาวน์โหลดไฟล์ผลงาน (.json)</button>
+      <button class="btn secondary" onclick="window.print()">🖨️ พิมพ์ / บันทึก PDF</button>
+      <button class="btn danger" onclick="clearAll()">ล้างข้อมูลในแบบฟอร์ม</button>
+    </div>
+    <p id="message" class="status" aria-live="polite">ข้อมูลยังไม่ถูกบันทึก</p>
+  </div>
+</div>
+<footer>Plant Explorer • เรียนรู้จากพืชจริงในโรงเรียน 🌱</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+const stage=document.getElementById("stage");
+if(!window.THREE||!THREE.OrbitControls){
+  stage.innerHTML='<p class="nowebgl">โหลดไลบรารี 3D ไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตแล้วรีเฟรชหน้า ส่วนใบงานด้านล่างยังใช้งานได้ตามปกติ</p>';
+  return;
+}
+let renderer;
+try{
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+}catch(e){
+  stage.innerHTML='<p class="nowebgl">อุปกรณ์นี้ไม่รองรับ WebGL จึงแสดงโมเดล 3 มิติไม่ได้ ส่วนใบงานด้านล่างยังใช้งานได้ตามปกติ</p>';
+  return;
+}
+const hsLayer=document.getElementById("hsLayer");
+const hcard=document.getElementById("hcard");
+const info=document.getElementById("info");
+const tabsEl=document.getElementById("tabs");
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(45,1,.1,100);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.12;
+stage.insertBefore(renderer.domElement,stage.firstChild);
+
+scene.add(new THREE.AmbientLight(0xffffff,.4));
+scene.add(new THREE.HemisphereLight(0xdff5e6,0x1d4a3a,.75));
+const sun=new THREE.DirectionalLight(0xfff1d2,1.15);
+sun.position.set(5,9,4);
+sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.near=.5;sun.shadow.camera.far=26;
+sun.shadow.camera.left=-5;sun.shadow.camera.right=5;sun.shadow.camera.top=5;sun.shadow.camera.bottom=-5;
+sun.shadow.bias=-.0004;sun.shadow.normalBias=.02;sun.shadow.radius=4;
+scene.add(sun);
+const rim=new THREE.DirectionalLight(0x9ad7ff,.4);
+rim.position.set(-6,3,-5);
+scene.add(rim);
+const fill=new THREE.PointLight(0xbff5d2,.5,16);
+fill.position.set(-3,2.5,4);
+scene.add(fill);
+
+const controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;
+controls.dampingFactor=.08;
+controls.enablePan=true;
+controls.enableZoom=true;
+controls.screenSpacePanning=true;
+controls.minDistance=3;
+controls.maxDistance=14;
+controls.maxPolarAngle=Math.PI/2.02;
+controls.autoRotate=true;
+controls.autoRotateSpeed=1.1;
+
+let seed=11;
+const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};
+const M=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.7,metalness:0},o||{}));
+const mesh=(geo,mat)=>{const m=new THREE.Mesh(geo,mat);m.castShadow=true;m.receiveShadow=true;return m;};
+const ap=(parent,x,y,z)=>{const o=new THREE.Object3D();o.position.set(x,y,z);parent.add(o);return o;};
+
+const platform=mesh(new THREE.CylinderGeometry(3.4,3.5,.2,72),M(0x1f4d3c,{roughness:.85}));
+platform.position.y=-.1;
+platform.castShadow=false;
+scene.add(platform);
+const ring=new THREE.Mesh(new THREE.TorusGeometry(3.4,.025,8,120),new THREE.MeshBasicMaterial({color:0x9ad7b5}));
+ring.rotation.x=Math.PI/2;
+ring.position.y=.005;
+scene.add(ring);
+
+function buildMoss(){
+  const g=new THREE.Group();
+  const sg=new THREE.SphereGeometry(1,12,9);
+  const hm=r=>.5*Math.max(0,1-(r/1.7)*(r/1.7));
+  for(let i=0;i<260;i++){
+    const ang=rnd()*6.2832,r=Math.sqrt(rnd())*1.7,s=.1+rnd()*.12;
+    const m=mesh(sg,M(new THREE.Color().setHSL(.25+rnd()*.07,.55,.24+rnd()*.14),{roughness:.95}));
+    m.scale.set(s,s*.8,s);
+    m.position.set(Math.cos(ang)*r,hm(r)+s*.5,Math.sin(ang)*r);
+    g.add(m);
+  }
+  const cg=new THREE.CylinderGeometry(.012,.018,1,6);
+  const spots=[[.3,.2],[-.5,.5],[.7,-.4],[-.2,-.7],[1,.4],[-.9,-.2],[.1,.9],[-.6,-.9],[.5,.8]];
+  let capPos=null;
+  spots.forEach((p,i)=>{
+    const h=.8+rnd()*.5,by=hm(Math.hypot(p[0],p[1]))+.1;
+    const st=mesh(cg,M(0xb98a3e));
+    st.scale.set(1,h,1);
+    st.position.set(p[0],by+h/2,p[1]);
+    g.add(st);
+    const cap=mesh(sg,M(0x8a5a2b,{roughness:.5}));
+    cap.scale.set(.06,.11,.06);
+    cap.position.set(p[0],by+h+.04,p[1]);
+    cap.rotation.z=.3;
+    g.add(cap);
+    if(i===0)capPos=[p[0],by+h+.1,p[1]];
+  });
+  const anchors=[ap(g,capPos[0],capPos[1],capPos[2]),ap(g,-1.05,.55,.5),ap(g,1.25,.16,-.8)];
+  return {group:g,anchors:anchors};
+}
+
+function buildFern(){
+  const g=new THREE.Group();
+  const sg=new THREE.SphereGeometry(1,10,8);
+  const sorusMat=M(0x6b3f1d,{roughness:.6});
+  const rhiz=mesh(sg,M(0x3a2a18,{roughness:.9}));
+  rhiz.scale.set(.28,.14,.28);
+  rhiz.position.y=.1;
+  g.add(rhiz);
+  let aSorus=null,aRachis=null;
+  for(let f=0;f<9;f++){
+    const fg=new THREE.Group();
+    fg.rotation.y=f/9*6.2832+rnd()*.3;
+    const len=1.9+rnd()*.5,pts=[];
+    for(let k=0;k<=14;k++){
+      const t=k/14;
+      pts.push(new THREE.Vector3(.15+t*len,.25+Math.sin(t*2.1)*.95-t*t*.35,0));
+    }
+    fg.add(mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),24,.022,6),M(0x2e6b3a)));
+    const lm=M(new THREE.Color().setHSL(.3+rnd()*.04,.55,.3+rnd()*.05),{roughness:.8,side:THREE.DoubleSide});
+    for(let k=2;k<=14;k++){
+      const t=k/14,p=pts[k],ll=.38*(1-t*.75)+.06;
+      [-1,1].forEach(function(sd){
+        const lf=mesh(sg,lm);
+        lf.scale.set(.055,.012,ll*.5);
+        lf.position.set(p.x,p.y-.01,sd*ll*.48);
+        lf.rotation.x=-sd*.25;
+        lf.rotation.z=-.2;
+        fg.add(lf);
+        if(k>=6&&k%2===0){
+          const so=mesh(sg,sorusMat);
+          so.scale.setScalar(.022);
+          so.position.set(p.x,p.y-.04,sd*ll*.62);
+          fg.add(so);
+        }
+        if(f===0&&k===8&&sd===1)aSorus=ap(fg,p.x,p.y-.06,sd*ll*.62);
+      });
+    }
+    if(f===0)aRachis=ap(fg,pts[4].x,pts[4].y+.06,0);
+    g.add(fg);
+  }
+  const fh=new THREE.Group();
+  fh.rotation.y=.5;
+  const cp=[];
+  for(let k=0;k<=6;k++)cp.push(new THREE.Vector3(0,k/6*.9,0));
+  for(let k=1;k<=30;k++){
+    const ph=k/30*Math.PI*2.4,r=.25*(1-k/30*.8);
+    cp.push(new THREE.Vector3(.25+r*Math.cos(Math.PI-ph),.9+r*Math.sin(Math.PI-ph),0));
+  }
+  fh.add(mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(cp),90,.03,8),M(0x9ad66b,{roughness:.6})));
+  fh.scale.setScalar(1.15);
+  g.add(fh);
+  const aFid=ap(fh,.25,1.12,0);
+  return {group:g,anchors:[aSorus,aFid,aRachis]};
+}
+
+function buildPine(){
+  const g=new THREE.Group();
+  const sg=new THREE.SphereGeometry(1,12,8);
+  const tree=new THREE.Group();
+  tree.position.set(-1,0,0);
+  g.add(tree);
+  const trunk=mesh(new THREE.CylinderGeometry(.1,.17,1.5,12),M(0x6b4a2b,{roughness:.95}));
+  trunk.position.y=.75;
+  tree.add(trunk);
+  const cols=[0x1f5a34,0x246b3c,0x2a7a44,0x318a4d];
+  [[1.15,1.1,1.3],[.95,1,1.9],[.75,.95,2.45],[.5,.9,3.0]].forEach(function(c,i){
+    const cone=mesh(new THREE.ConeGeometry(c[0],c[1],22),M(cols[i],{roughness:.9}));
+    cone.position.y=c[2];
+    tree.add(cone);
+  });
+  const sc=new THREE.Group();
+  sc.position.set(1.55,.05,.55);
+  sc.scale.setScalar(1.5);
+  sc.rotation.z=.12;
+  g.add(sc);
+  const core=mesh(new THREE.CylinderGeometry(.08,.14,1.1,10),M(0x4a2f17));
+  core.position.y=.55;
+  sc.add(core);
+  const scaleMat=M(0x8a5a2e,{roughness:.7});
+  for(let j=0;j<11;j++){
+    const y=.08+j*.095,rr=.2*Math.sin(Math.PI*(j+.8)/12.5)+.04;
+    for(let i=0;i<7;i++){
+      const an=i/7*6.2832+j*.7;
+      const s=mesh(sg,scaleMat);
+      s.scale.set(.15,.05,.1);
+      s.position.set(Math.cos(an)*rr,y,Math.sin(an)*rr);
+      s.rotation.set(0,-an,-.45);
+      sc.add(s);
+    }
+  }
+  const seed1=mesh(sg,M(0xd2a35c,{roughness:.6}));
+  seed1.scale.set(.05,.025,.09);
+  seed1.position.set(2.5,.03,.3);
+  seed1.rotation.y=.6;
+  g.add(seed1);
+  const wing=mesh(sg,M(0xe8cf9a,{roughness:.5,side:THREE.DoubleSide}));
+  wing.scale.set(.1,.006,.05);
+  wing.position.set(2.56,.045,.2);
+  wing.rotation.y=.6;
+  g.add(wing);
+  const anchors=[ap(sc,.32,.5,0),ap(tree,.5,1.65,.3),ap(tree,.17,.7,0),ap(g,2.5,.12,.3)];
+  return {group:g,anchors:anchors};
+}
+
+function buildFlower(){
+  const g=new THREE.Group();
+  const sg=new THREE.SphereGeometry(1,18,12);
+  const stem=mesh(new THREE.CylinderGeometry(.045,.07,2.3,10),M(0x3f8f4a));
+  stem.position.y=1.15;
+  g.add(stem);
+  [[1,.8],[-1,1.25]].forEach(function(l){
+    const lf=mesh(sg,M(0x3f9a4f,{side:THREE.DoubleSide}));
+    lf.scale.set(.55,.025,.2);
+    lf.position.set(l[0]*.5,l[1]+.12,0);
+    lf.rotation.z=l[0]*.35;
+    g.add(lf);
+    const vein=mesh(new THREE.CylinderGeometry(.008,.008,1,5),M(0x2a6a35));
+    vein.scale.set(1,1,1);
+    vein.rotation.z=Math.PI/2+l[0]*.35;
+    vein.position.set(l[0]*.5,l[1]+.14,0);
+    g.add(vein);
+  });
+  const head=new THREE.Group();
+  head.position.y=2.3;
+  head.rotation.x=-.12;
+  g.add(head);
+  for(let layer=0;layer<2;layer++){
+    for(let i=0;i<8;i++){
+      const an=i/8*6.2832+layer*.39;
+      const pivot=new THREE.Group();
+      pivot.rotation.y=an;
+      pivot.rotation.z=layer?.62:.34;
+      pivot.position.y=layer?.02:0;
+      const p=mesh(sg,M(layer?0xf59abf:0xf06fa0,{roughness:.55,side:THREE.DoubleSide}));
+      p.scale.set(layer?.4:.5,.022,.2);
+      p.position.x=layer?.42:.5;
+      pivot.add(p);
+      head.add(pivot);
+    }
+  }
+  for(let i=0;i<5;i++){
+    const an=i/5*6.2832;
+    const pv=new THREE.Group();
+    pv.rotation.y=an;
+    pv.rotation.z=-.5;
+    const sp=mesh(sg,M(0x4c9f4e));
+    sp.scale.set(.2,.02,.07);
+    sp.position.x=.18;
+    pv.add(sp);
+    pv.position.y=-.06;
+    head.add(pv);
+  }
+  const ovary=mesh(sg,M(0x7ccf62,{transparent:true,opacity:.62,roughness:.3}));
+  ovary.scale.set(.2,.26,.2);
+  ovary.position.y=.14;
+  head.add(ovary);
+  for(let i=0;i<4;i++){
+    const ov=mesh(sg,M(0xfff1b8,{roughness:.4}));
+    ov.scale.setScalar(.05);
+    const an=i/4*6.2832;
+    ov.position.set(Math.cos(an)*.08,.1+(i%2)*.1,Math.sin(an)*.08);
+    head.add(ov);
+  }
+  const style=mesh(new THREE.CylinderGeometry(.022,.03,.5,8),M(0xb6e08a));
+  style.position.y=.55;
+  head.add(style);
+  const stigma=mesh(sg,M(0xffe27a,{roughness:.4}));
+  stigma.scale.setScalar(.065);
+  stigma.position.y=.82;
+  head.add(stigma);
+  for(let i=0;i<8;i++){
+    const an=i/8*6.2832,r=.3;
+    const fil=mesh(new THREE.CylinderGeometry(.008,.01,.5,6),M(0xf6f0c8));
+    fil.position.set(Math.cos(an)*r,.3,Math.sin(an)*r);
+    head.add(fil);
+    const an2=mesh(sg,M(0xf2a51f,{roughness:.5}));
+    an2.scale.set(.045,.06,.045);
+    an2.position.set(Math.cos(an)*r,.58,Math.sin(an)*r);
+    head.add(an2);
+  }
+  const anchors=[ap(head,.95,.34,0),ap(head,.3,.62,0),ap(head,0,.14,.2),ap(g,.78,.98,0)];
+  return {group:g,anchors:anchors};
+}
+
+const DATA=[
+{
+  name:"Bryophyta",sub:"พืชไม่มีท่อลำเลียง • มอส ลิเวอร์เวิร์ต ฮอร์นเวิร์ต",color:"#8fd38a",
+  desc:"พืชกลุ่มแรกที่ขึ้นบกและยังไม่มีท่อลำเลียงแท้ จึงมักเตี้ย เติบโตในที่ชื้น ระยะแกมีโทไฟต์เป็นต้นที่เห็นเด่นชัด",
+  traits:["ไม่มีท่อลำเลียง","ไม่มีรากแท้ มีไรซอยด์","แกมีโทไฟต์เด่น","สปอโรไฟต์พึ่งแกมีโทไฟต์","ต้องใช้น้ำในการปฏิสนธิ"],
+  examples:["มอส","ลิเวอร์เวิร์ต","ฮอร์นเวิร์ต"],
+  cam:[4.6,3.2,5.4],target:[0,.5,0],build:buildMoss,
+  hs:[
+    {tag:"สปอโรไฟต์",title:"ก้านชูและอับสปอร์",text:"สปอโรไฟต์ (2n) งอกจากแกมีโทไฟต์ ประกอบด้วยก้านและอับสปอร์ที่สร้างสปอร์ด้วยไมโอซิส เมื่อสปอร์ตกในที่ชื้นจะงอกเป็นแกมีโทไฟต์ใหม่"},
+    {tag:"แกมีโทไฟต์",title:"ต้นมอสที่เห็นเป็นพรมสีเขียว",text:"ส่วนที่เป็นพรมสีเขียวคือแกมีโทไฟต์ (n) ที่สังเคราะห์ด้วยแสงได้ มีส่วนคล้ายลำต้นและใบแต่ไม่ใช่ราก ลำต้น ใบแท้ เพราะไม่มีท่อลำเลียง"},
+    {tag:"ไรซอยด์",title:"ไรซอยด์ยึดเกาะพื้นผิว",text:"ไรซอยด์เป็นเส้นเล็กๆ ทำหน้าที่ยึดเกาะ ไม่ใช่รากแท้ และดูดน้ำได้น้อย มอสจึงดูดซับน้ำผ่านผิวลำต้นและใบเป็นหลัก"}
+  ]
+},
+{
+  name:"Pteridophyta",sub:"พืชมีท่อลำเลียง ไม่มีเมล็ด • เฟิน",color:"#b6e07a",
+  desc:"เป็นพืชไม่มีเมล็ดที่มีท่อลำเลียง (ไซเลมและโฟลเอม) ระยะสปอโรไฟต์เป็นต้นที่เห็นเด่นชัด และแกมีโทไฟต์ขนาดเล็กอยู่อิสระ",
+  traits:["มีท่อลำเลียง","ไม่มีเมล็ด ไม่มีดอก","สปอโรไฟต์เด่น","ใบอ่อนม้วนงอ","กลุ่มอับสปอร์ใต้ใบ"],
+  examples:["เฟินบอสตัน","ย่านลิเภา","ชายผ้าสีดา"],
+  cam:[5.2,3.4,5.8],target:[0,.9,0],build:buildFern,
+  hs:[
+    {tag:"อับสปอร์",title:"กลุ่มอับสปอร์ (Sorus)",text:"จุดสีน้ำตาลด้านล่างของใบคือกลุ่มอับสปอร์ ภายในสร้างสปอร์จำนวนมาก ใช้เป็นหลักฐานสำคัญเมื่อสำรวจเฟินในภาคสนามโดยไม่ต้องเด็ดต้น"},
+    {tag:"ใบอ่อน",title:"ใบอ่อนม้วนงอ",text:"ใบอ่อนของเฟินม้วนเป็นวงก้นหอย แล้วค่อยๆ คลี่ออกเมื่อเติบโต ลักษณะนี้พบได้ในเฟินหลายชนิด"},
+    {tag:"ท่อลำเลียง",title:"ก้านใบและท่อลำเลียง",text:"เฟินมีไซเลมและโฟลเอมลำเลียงน้ำและอาหาร ทำให้ต้นสูงกว่ามอสได้ และมีราก ลำต้น ใบ ที่แท้จริง"}
+  ]
+},
+{
+  name:"Gymnosperms",sub:"พืชเมล็ดเปลือย • สน ปรง แปะก๊วย",color:"#f0c36a",
+  desc:"พืชมีเมล็ดที่ไม่มีรังไข่หุ้ม เมล็ดจึงเปลือยอยู่บนเกล็ดของโคน ละอองเรณูส่วนใหญ่ถูกพัดไปด้วยลม",
+  traits:["มีเมล็ดแต่ไม่มีผล","ไม่มีดอกจริง","สร้างโคน (Strobilus)","ใบรูปเข็มหรือเกล็ด","ผสมเกสรด้วยลม"],
+  examples:["สนสามใบ","ปรง","แปะก๊วย"],
+  cam:[5.8,3.4,6.6],target:[.3,1.4,0],build:buildPine,
+  hs:[
+    {tag:"โคน",title:"โคนเพศเมียและเกล็ด",text:"เมล็ดวางเปลือยอยู่บนเกล็ดของโคน ไม่ถูกหุ้มด้วยรังไข่ จึงเรียกว่าเมล็ดเปลือย พืชกลุ่มนี้แยกโคนเพศผู้และโคนเพศเมียกัน"},
+    {tag:"ใบ",title:"ใบรูปเข็ม",text:"ใบแคบมีคิวทิเคิลหนา ช่วยลดการสูญเสียน้ำ เหมาะกับสภาพที่แห้งหรือหนาวเย็น"},
+    {tag:"ลำต้น",title:"ลำต้นเนื้อไม้",text:"มีการเจริญขั้นทุติยภูมิ จึงเกิดเนื้อไม้ที่แข็งแรง ลำเลียงน้ำด้วยเทรคีด ไม่มีเวสเซลเหมือนพืชดอก"},
+    {tag:"เมล็ด",title:"เมล็ดมีปีก",text:"เมื่อโคนแก่เกล็ดจะเปิดออก เมล็ดมีปีกบางจะหลุดและปลิวไปตามลม ช่วยการแพร่กระจาย"}
+  ]
+},
+{
+  name:"Angiosperms",sub:"พืชดอก • ใบเลี้ยงเดี่ยวและใบเลี้ยงคู่",color:"#f58fb6",
+  desc:"กลุ่มพืชที่มีความหลากหลายมากที่สุด มีดอกเป็นอวัยวะสืบพันธุ์ เมล็ดอยู่ในรังไข่ซึ่งเจริญเป็นผล",
+  traits:["มีดอก","เมล็ดอยู่ในผล","ปฏิสนธิซ้อน","มีเวสเซลและไฟเบอร์","แบ่งใบเลี้ยงเดี่ยว/คู่"],
+  examples:["ชบา","ข้าว","ถั่ว"],
+  cam:[4.4,3.8,5],target:[0,1.5,0],build:buildFlower,
+  hs:[
+    {tag:"กลีบดอก",title:"กลีบดอก (Petal)",text:"ช่วยดึงดูดแมลงหรือสัตว์ผสมเกสร จำนวนกลีบและลักษณะดอกใช้ช่วยจำแนกพืชดอกในภาคสนามได้"},
+    {tag:"เกสรเพศผู้",title:"อับเรณูและก้านชูอับเรณู",text:"อับเรณูสร้างละอองเรณูซึ่งมีเซลล์สืบพันธุ์เพศผู้ ก้านชูอับเรณูชูอับเรณูให้อยู่ในตำแหน่งที่เหมาะต่อการถ่ายละอองเรณู"},
+    {tag:"รังไข่",title:"รังไข่และออวุล",text:"ออวุลอยู่ภายในรังไข่ หลังปฏิสนธิออวุลเจริญเป็นเมล็ด และรังไข่เจริญเป็นผล เป็นลักษณะเด่นที่ต่างจากพืชเมล็ดเปลือย"},
+    {tag:"ใบ",title:"ใบและเส้นใบ",text:"รูปแบบเส้นใบช่วยแยกกลุ่ม พืชใบเลี้ยงเดี่ยวมักมีเส้นใบขนาน ส่วนพืชใบเลี้ยงคู่มักมีเส้นใบแบบร่างแห"}
+  ]
+}
+];
+
+let cur=null,t0=0,hsOn=true,activeHs=-1,idx=-1,btns=[];
+
+function disposeGroup(grp){
+  grp.traverse(function(o){
+    if(o.geometry)o.geometry.dispose();
+    if(o.material)o.material.dispose();
+  });
+}
+
+function setStyleColor(el,c){el.style.setProperty("--c",c);}
+
+function renderTabs(){
+  tabsEl.innerHTML="";
+  DATA.forEach(function(d,i){
+    const b=document.createElement("button");
+    b.className="tab";
+    b.setAttribute("role","tab");
+    b.innerHTML='<i></i>'+d.name;
+    setStyleColor(b,d.color);
+    b.addEventListener("click",function(){mount(i);});
+    tabsEl.appendChild(b);
+  });
+}
+
+function renderInfo(i){
+  const d=DATA[i];
+  info.style.setProperty("--c",d.color);
+  info.innerHTML='<div><h3>'+d.name+'</h3><p class="sub">'+d.sub+'</p></div>'+
+    '<p>'+d.desc+'</p>'+
+    '<div><h5>ลักษณะสำคัญ</h5><div class="chips">'+d.traits.map(function(t){return '<span class="chip">'+t+'</span>';}).join("")+'</div></div>'+
+    '<div><h5>ตัวอย่างพืช</h5><div class="chips">'+d.examples.map(function(t){return '<span class="chip">'+t+'</span>';}).join("")+'</div></div>'+
+    '<div><h5>จุดสังเกตบนโมเดล</h5><div class="hsitems">'+d.hs.map(function(h,k){return '<button class="hsitem" data-i="'+k+'"><b>'+(k+1)+'</b>'+h.title+'</button>';}).join("")+'</div></div>';
+  info.classList.remove("swap");
+  void info.offsetWidth;
+  info.classList.add("swap");
+  info.querySelectorAll(".hsitem").forEach(function(b){
+    b.addEventListener("click",function(){openCard(Number(b.dataset.i));});
+  });
+}
+
+function closeCard(){
+  hcard.classList.remove("show");
+  activeHs=-1;
+  btns.forEach(function(b){b.classList.remove("on");});
+}
+
+function openCard(k){
+  const d=DATA[idx],h=d.hs[k];
+  hcard.style.setProperty("--c",d.color);
+  hcard.innerHTML='<button class="x" aria-label="ปิดการ์ด">✕</button><span class="tag">'+h.tag+'</span><h4>'+(k+1)+'. '+h.title+'</h4><p>'+h.text+'</p>';
+  hcard.classList.remove("show");
+  void hcard.offsetWidth;
+  hcard.classList.add("show");
+  hcard.querySelector(".x").addEventListener("click",closeCard);
+  activeHs=k;
+  btns.forEach(function(b,j){b.classList.toggle("on",j===k);});
+}
+
+function applyView(){
+  const d=DATA[idx];
+  camera.position.set(d.cam[0],d.cam[1],d.cam[2]);
+  controls.target.set(d.target[0],d.target[1],d.target[2]);
+  controls.update();
+}
+
+function mount(i){
+  if(i===idx)return;
+  if(cur){scene.remove(cur.group);disposeGroup(cur.group);}
+  hsLayer.innerHTML="";
+  btns=[];
+  closeCard();
+  idx=i;
+  const d=DATA[i];
+  cur={group:null,anchors:[]};
+  const built=d.build();
+  cur.group=built.group;
+  cur.anchors=built.anchors;
+  cur.group.scale.setScalar(.01);
+  scene.add(cur.group);
+  t0=performance.now();
+  d.hs.forEach(function(h,k){
+    const b=document.createElement("button");
+    b.className="hs";
+    b.textContent=String(k+1);
+    b.setAttribute("aria-label",h.title);
+    b.style.setProperty("--c",d.color);
+    b.style.opacity="0";
+    b.addEventListener("click",function(){openCard(k);});
+    hsLayer.appendChild(b);
+    btns.push(b);
+  });
+  tabsEl.querySelectorAll(".tab").forEach(function(t,j){t.classList.toggle("on",j===i);t.setAttribute("aria-selected",j===i?"true":"false");});
+  renderInfo(i);
+  applyView();
+}
+
+function resize(){
+  const w=stage.clientWidth,h=stage.clientHeight;
+  if(!w||!h)return;
+  renderer.setSize(w,h,false);
+  renderer.domElement.style.width=w+"px";
+  renderer.domElement.style.height=h+"px";
+  camera.aspect=w/h;
+  camera.updateProjectionMatrix();
+}
+if(window.ResizeObserver)new ResizeObserver(resize).observe(stage);
+window.addEventListener("resize",resize);
+
+document.getElementById("btnRotate").addEventListener("click",function(e){
+  controls.autoRotate=!controls.autoRotate;
+  e.currentTarget.classList.toggle("on",controls.autoRotate);
+});
+document.getElementById("btnHs").addEventListener("click",function(e){
+  hsOn=!hsOn;
+  e.currentTarget.classList.toggle("on",hsOn);
+  if(!hsOn)closeCard();
+});
+document.getElementById("btnReset").addEventListener("click",applyView);
+renderer.domElement.addEventListener("pointerdown",function(){
+  if(controls.autoRotate){
+    controls.autoRotate=false;
+    document.getElementById("btnRotate").classList.remove("on");
+  }
+});
+
+const v=new THREE.Vector3();
+function frame(){
+  requestAnimationFrame(frame);
+  controls.update();
+  let k=1;
+  if(cur){
+    k=Math.min(1,(performance.now()-t0)/800);
+    const c1=1.70158,c3=c1+1;
+    const e=1+c3*Math.pow(k-1,3)+c1*Math.pow(k-1,2);
+    cur.group.scale.setScalar(Math.max(.01,e));
+  }
+  renderer.render(scene,camera);
+  if(cur){
+    const w=stage.clientWidth,h=stage.clientHeight;
+    cur.anchors.forEach(function(an,i){
+      const b=btns[i];
+      if(!b)return;
+      an.getWorldPosition(v);
+      v.project(camera);
+      const x=(v.x*.5+.5)*w,y=(-v.y*.5+.5)*h;
+      b.style.transform="translate("+x+"px,"+y+"px) translate(-50%,-50%)";
+      const show=hsOn&&k>=1&&v.z<1;
+      b.style.opacity=show?"1":"0";
+      b.style.pointerEvents=show?"auto":"none";
+    });
+  }
+}
+
+renderTabs();
+resize();
+mount(0);
+frame();
+})();
+</script>
+<script>
+const divisions=["Bryophyta","Pteridophyta","Gymnosperms","Angiosperms","ยังไม่แน่ใจ"];
+let plantCount=0, evidenceCount=0;
+function makePlant(i){
+ return `<div class="plant">
+ <h3>พืชลำดับที่ ${i}</h3>
+ <div class="grid">
+ <div><label>ชื่อพืช</label><input data-p="${i}" data-k="name" placeholder="ชื่อสามัญ/ชื่อวิทยาศาสตร์"></div>
+ <div><label>บริเวณที่พบ</label><input data-p="${i}" data-k="location" placeholder="เช่น สวนหน้าอาคาร"></div>
+ <div><label>Division</label><select data-p="${i}" data-k="division">${divisions.map(d=>`<option>${d}</option>`).join("")}</select></div>
+ <div><label>ลักษณะเด่นที่สังเกตได้</label><input data-p="${i}" data-k="traits" placeholder="เช่น มีใบเป็นแฉก มีอับสปอร์"></div>
+ </div>
+ <label>เหตุผล/หลักฐานที่ใช้จำแนก</label><textarea data-p="${i}" data-k="reason" placeholder="อธิบายลักษณะที่ใช้ประกอบการจำแนก"></textarea>
+ <button class="btn danger" onclick="removePlant(${i})">ลบรายการนี้</button>
+ </div>`;
+}
+function addPlant(){plantCount++;document.getElementById("plants").insertAdjacentHTML("beforeend",makePlant(plantCount));}
+function removePlant(i){const el=document.querySelector(`[data-p="${i}"]`).closest(".plant");if(el)el.remove();}
+function makeEvidence(i){
+ return `<div class="plant"><h3>ภาพหลักฐานที่ ${i}</h3>
+ <label>แนบภาพถ่ายพืช (ภาพจะอยู่ในข้อมูลที่บันทึก)</label>
+ <input type="file" accept="image/*" id="photo${i}" onchange="previewImage(${i})">
+ <img id="preview${i}" class="photo-preview" alt="ภาพตัวอย่าง" style="display:none">
+ <div class="grid"><div><label>ชื่อพืช</label><input id="evname${i}"></div><div><label>Division</label><select id="evdiv${i}">${divisions.map(d=>`<option>${d}</option>`).join("")}</select></div></div>
+ <label>ลักษณะเด่นและหลักฐานจากภาพ</label><textarea id="evdesc${i}"></textarea></div>`;
+}
+function addEvidence(){evidenceCount++;document.getElementById("evidence").insertAdjacentHTML("beforeend",makeEvidence(evidenceCount));}
+function previewImage(i){const f=document.getElementById("photo"+i).files[0];if(!f)return;const img=document.getElementById("preview"+i);img.src=URL.createObjectURL(f);img.style.display="block";}
+function collect(){
+ const fields=["student1","class1","student2","class2","school","date","q1","q2","q3","q4","q5","summary","role1","role2"];
+ const data={members:{},plants:[],evidence:[],answers:{},roles:{}};
+ fields.slice(0,6).forEach(k=>data.members[k]=document.getElementById(k).value);
+ document.querySelectorAll("[data-p]").forEach(el=>{const i=el.dataset.p,k=el.dataset.k;let p=data.plants.find(x=>x.id==i);if(!p){p={id:Number(i)};data.plants.push(p)}p[k]=el.value});
+ ["q1","q2","q3","q4","q5","summary"].forEach(k=>data.answers[k]=document.getElementById(k).value);
+ ["role1","role2"].forEach(k=>data.roles[k]=document.getElementById(k).value);
+ for(let i=1;i<=evidenceCount;i++){
+  const f=document.getElementById("photo"+i)?.files[0];
+  data.evidence.push({name:document.getElementById("evname"+i)?.value||"",division:document.getElementById("evdiv"+i)?.value||"",description:document.getElementById("evdesc"+i)?.value||"",imageName:f?.name||"",imageData:null});
+ }
+ return data;
+}
+async function collectWithImages(){
+ const data=collect();
+ for(let i=1;i<=evidenceCount;i++){const f=document.getElementById("photo"+i)?.files[0];if(f)data.evidence[i-1].imageData=await toBase64(f);}
+ return data;
+}
+function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});}
+async function saveLocal(){try{localStorage.setItem("plantExplorer",JSON.stringify(await collectWithImages()));msg("บันทึกข้อมูลไว้ในเบราว์เซอร์นี้แล้ว ✓");}catch(e){msg("บันทึกไม่สำเร็จ อาจมีภาพขนาดใหญ่เกินพื้นที่จัดเก็บ กรุณาส่งออก JSON");}}
+function loadLocal(){const s=localStorage.getItem("plantExplorer");if(!s){msg("ยังไม่พบข้อมูลที่บันทึก");return;}const d=JSON.parse(s);clearForm(false);
+ Object.entries(d.members||{}).forEach(([k,v])=>{if(document.getElementById(k))document.getElementById(k).value=v});
+ (d.plants||[]).forEach(p=>{addPlant();Object.entries(p).forEach(([k,v])=>{const el=document.querySelector(`[data-p="${plantCount}"][data-k="${k}"]`);if(el)el.value=v})});
+ ["q1","q2","q3","q4","q5","summary"].forEach(k=>document.getElementById(k).value=d.answers?.[k]||"");
+ ["role1","role2"].forEach(k=>document.getElementById(k).value=d.roles?.[k]||"");
+ (d.evidence||[]).forEach((e,i)=>{addEvidence();document.getElementById("evname"+evidenceCount).value=e.name;document.getElementById("evdiv"+evidenceCount).value=e.division;document.getElementById("evdesc"+evidenceCount).value=e.description;if(e.imageData){const im=document.getElementById("preview"+evidenceCount);im.src=e.imageData;im.style.display="block";}});
+ msg("โหลดข้อมูลเดิมแล้ว ✓");
+}
+function exportJSON(){collectWithImages().then(d=>{const blob=new Blob([JSON.stringify(d,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="Plant_Explorer_"+(d.members.student1||"student").replace(/\s+/g,"_")+".json";a.click();URL.revokeObjectURL(a.href);msg("ดาวน์โหลดไฟล์ผลงานแล้ว ✓");});}
+function msg(t){document.getElementById("message").textContent=t;}
+function clearForm(resetCounters=true){document.querySelectorAll("input:not([type=file]),textarea").forEach(e=>e.value="");document.getElementById("plants").innerHTML="";document.getElementById("evidence").innerHTML="";if(resetCounters){plantCount=0;evidenceCount=0;}}
+function clearAll(){if(confirm("ต้องการล้างข้อมูลทั้งหมดในแบบฟอร์มหรือไม่?")){clearForm();localStorage.removeItem("plantExplorer");msg("ล้างข้อมูลแล้ว");}}
+document.getElementById("date").value=new Date().toISOString().slice(0,10);
+for(let i=0;i<8;i++)addPlant();for(let i=0;i<4;i++)addEvidence();
+</script>
+</body>
+</html>
